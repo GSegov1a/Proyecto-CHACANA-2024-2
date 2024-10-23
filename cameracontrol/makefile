@@ -1,14 +1,21 @@
+# Informacion
 CC=g++
-CFLAGS=-I./ASI_SDK_V1.36/include/ -I/usr/include/opencv4/  
-LD=./ASI_SDK_V1.36/lib/x64/
+CFLAGS=-I./src/ASICamera/include/ -I/usr/include/opencv4/ 
+LD=./src/ASICamera/lib/x64/
 LDIR=-L$(LD)
 LIBS=-lASICamera2 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio 
 
-live_camera: live_camera.cpp
-	$(CC) $< -o $@ $(CFLAGS)  $(LDIR) $(LIBS)
+# Nombre del ejecutable
+TARGET = bin/live_camera
 
+# Compilar el programa
+$(TARGET): src/live_camera.cpp
+	$(CC) $< -o $@ $(CFLAGS) $(LDIR) $(LIBS)
+
+# Limpiar el ejecutable
 clean:
-	rm -f live_camera
+	rm -f $(TARGET)
 
-run:
-	LD_LIBRARY_PATH=${LD} ./live_camera
+# Ejecución del programa
+run: $(TARGET)
+	LD_LIBRARY_PATH=$(LD) ./$(TARGET)

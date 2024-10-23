@@ -1,1 +1,11 @@
-.vscode
+# Ignorar todos los archivos en la carpeta bin/
+**/bin/*
+
+# Permitir que las carpetas bin/ permanezcan
+!**/bin/
+
+# Permitir que las carpetas bin/ estén vacías con un archivo .gitkeep
+!**/bin/.gitkeep
+
+# Ignorar la carpeta .vscode
+.vscode/
