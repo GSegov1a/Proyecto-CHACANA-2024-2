@@ -10,4 +10,6 @@
 # Ignorar la carpeta .vscode
 .vscode/
 
+# Ignorar todos los archivos .avi
 *.avi
+*.AVI
