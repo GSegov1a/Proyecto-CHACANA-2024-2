@@ -16,3 +16,9 @@
 
 # Ignorar la carpeta records dentro de cameracontrol
 cameracontrol/records/
+
+# Ignorar todos los archivos .log
+*.log
+
+# Ignorar todos los archivos dentro de la carpeta logs/
+**/logs/*
