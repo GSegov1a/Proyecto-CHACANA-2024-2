@@ -165,7 +165,7 @@ int main() {
     cv::resizeWindow("Live Camera", realCameraWidth / 2 , realCameraHeight / 2 );
 
     // INICIALIZAR GUARDADO DE VIDEO
-    std::string videoFileName = "records/output_bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp/1000) + "ms" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
+    std::string videoFileName = "records/output_bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
     cv::VideoWriter videoWriter;
     videoWriter.open(videoFileName, cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 10, cv::Size(realCameraWidth, realCameraHeight), false);
     
