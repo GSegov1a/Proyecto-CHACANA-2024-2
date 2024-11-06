@@ -232,6 +232,9 @@ int main() {
 
 
     int k = 0;
+    double fps = 0.0;
+    double tickFrequency = cv::getTickFrequency();
+    double lastTime = cv::getTickCount();
     while (true) {
         errCode = ASIGetVideoData(cameraId, frameBuffer, bufferSize, 2*cameraExp + 500);
         if (errCode != ASI_SUCCESS) {
@@ -249,13 +252,19 @@ int main() {
         // Mostrar el frame en la ventana
         cv::imshow("Live Camera", img);
         
+        // Calcular el tiempo transcurrido y el FPS
+        double currentTime = cv::getTickCount();
+        double timeElapsed = (currentTime - lastTime) / tickFrequency;
+        fps = 1.0 / timeElapsed;
+        lastTime = currentTime; 
+
+        // Mostrar FPS en la consola
+        std::cout << "FPS: " << fps << std::endl;
 
         // Esperar 1 ms entre frames (permite cerrar la ventana con 'q')
         if (cv::waitKey(1) == 'q') {
             break;
         }
-        
-        std::cerr << "Frame: " << k << std::endl; 
         
     }
     delete[] frameBuffer;
