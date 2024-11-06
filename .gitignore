@@ -20,5 +20,11 @@ cameracontrol/records/
 # Ignorar todos los archivos .log
 *.log
 
-# Ignorar todos los archivos dentro de la carpeta logs/
+# Ignorar todos los archivos en la carpeta log/
 **/logs/*
+
+# Permitir que las carpetas bin/ permanezcan
+!**/logs/
+
+# Permitir que las carpetas bin/ estén vacías con un archivo .gitkeep
+!**/logs/.gitkeep
