@@ -22,7 +22,7 @@ std::string sky_status_api_request(){
 
     if (curl) {
         // Establece la URL de la API
-        curl_easy_setopt(curl, CURLOPT_URL, "https://api.open-meteo.com/v1/forecast?latitude=-33.4569&longitude=-70.6483&current_weather=true");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://api.open-meteo.com/v1/forecast?latitude=-33.269522&longitude=-70.534691&current_weather=true");
 
         // Establece la función de callback para manejar la respuesta
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleResponse);
