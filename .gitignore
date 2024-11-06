@@ -13,3 +13,6 @@
 # Ignorar todos los archivos .avi
 *.avi
 *.AVI
+
+# Ignorar la carpeta records dentro de cameracontrol
+cameracontrol/records/
