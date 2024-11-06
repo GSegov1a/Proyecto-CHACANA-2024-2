@@ -231,17 +231,19 @@ int main() {
     }
 
 
-    int k = 0;
+    int framesCount = 0;
     double fps = 0.0;
     double tickFrequency = cv::getTickFrequency();
-    double lastTime = cv::getTickCount();
+    double lastTime = cv::getTickCount(); // Variable para calcular FPS cada iteracion
+    double startTime = cv::getTickCount(); // Variable para calcular cuanto tiempo se grabo en total
+
     while (true) {
         errCode = ASIGetVideoData(cameraId, frameBuffer, bufferSize, 2*cameraExp + 500);
         if (errCode != ASI_SUCCESS) {
             std::cerr << "Error al obtener los datos de un frame en la cámara de grabacion. " << "Código de error: " << errCode << std::endl;
             continue;
         }
-        k += 1;
+        framesCount += 1;
 
         // Convertir el buffer a cv::Mat (formato de imagen en escala de grises RAW8)
         cv::Mat img(realCameraHeight, realCameraWidth, CV_8UC1, frameBuffer);
@@ -267,6 +269,15 @@ int main() {
         }
         
     }
+
+    // Calcular el tiempo total de grabación y printear
+    double endTime = cv::getTickCount();
+    double recordingDuration = (endTime - startTime) / tickFrequency;
+
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "Tiempo total de grabacion: " << recordingDuration << " segundos." << std::endl;
+    std::cout << "Frames grabados: " << framesCount << std::endl;
+
     delete[] frameBuffer;
 
     errCode = ASIStopVideoCapture(cameraId);
