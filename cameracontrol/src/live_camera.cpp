@@ -149,10 +149,10 @@ int main() {
     int cameraBinning = 1;
     int cameraExp = 32; // en microsegundos 1000 us = 1 ms
     int cameraGain = 100;
-    int cameraBandWidth = 70;
+    int cameraBandWidth = 75;
     int cameraHightSpeedMode = 0;
 
-    int realCameraWidth = 2000 / cameraBinning;
+    int realCameraWidth = 1800 / cameraBinning;
     int realCameraHeight = 1400 / cameraBinning;
 
     int bufferSize = realCameraWidth * realCameraHeight; 
