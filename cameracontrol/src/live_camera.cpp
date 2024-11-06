@@ -146,14 +146,14 @@ int main() {
     int cameraHeight = 2080;
     
     ASI_IMG_TYPE imgType = ASI_IMG_RAW8; //IMPORTANTE: EN CASO DE SER RAW16 MULTIPLICAR BUFFERSIZE POR 2
-    int cameraBinning = 2;
-    int cameraExp = 100000; // en microsegundos 1000 us = 1 ms
-    int cameraGain = 300;
+    int cameraBinning = 1;
+    int cameraExp = 32; // en microsegundos 1000 us = 1 ms
+    int cameraGain = 100;
     int cameraBandWidth = 80;
     int cameraHightSpeedMode = 0;
 
-    int realCameraWidth = 3096 / cameraBinning;
-    int realCameraHeight = 2080 / cameraBinning;
+    int realCameraWidth = 2000 / cameraBinning;
+    int realCameraHeight = 1400 / cameraBinning;
 
     int bufferSize = realCameraWidth * realCameraHeight; 
     unsigned char* frameBuffer = new unsigned char[bufferSize];
