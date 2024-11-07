@@ -14,29 +14,35 @@ if not ret:
     exit()
 
 frame1_gray = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-frame1_gray = cv2.medianBlur(frame1_gray, 5)  # Suavizar sin perder bordes
 
+cv2.namedWindow('Detección de Movimiento', cv2.WINDOW_NORMAL)
+
+i = -1
 while cap.isOpened():
     ret, frame2 = cap.read()
     if not ret:
         break
 
+    i = i * (-1)
+    if i > 0:
+        print('frame saltado')
+        continue
+    print('frame, no saltado')
+
     # Convertir el segundo cuadro a escala de grises
     frame2_gray = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-    frame2_gray = cv2.medianBlur(frame2_gray, 5)
 
     # Calcular la diferencia absoluta entre cuadros
     diff = cv2.absdiff(frame1_gray, frame2_gray)
 
     # Aplicar un umbral para resaltar las áreas con movimiento
-    _, thresh = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)  # Umbral más bajo
+    _, thresh = cv2.threshold(diff, 110, 255, cv2.THRESH_BINARY)  # Umbral más bajo
+
 
     # Dilatar la imagen para llenar los huecos
-    thresh = cv2.dilate(thresh, None, iterations=2)
+    thresh = cv2.dilate(thresh, None, iterations=3)
+    cv2.imshow('Umbral Dilatado', thresh)
 
-    # Aplicar apertura para reducir el ruido
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 
     # Encuentra los contornos
     contours, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -46,8 +52,6 @@ while cap.isOpened():
 
     # Dibujar los contornos en el cuadro original
     for contour in contours:
-        if cv2.contourArea(contour) < 200:  # Cambiar a un área mínima más pequeña
-            continue
         (x, y, w, h) = cv2.boundingRect(contour)
         cv2.rectangle(frame_with_contours, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Marco verde
 
