@@ -142,11 +142,11 @@ int main() {
 
     //COMENZAMOS GRABACION
     int cameraId = 0;
-    int cameraWidth = 2500; // VALORES DE ANCHO MAXIMA DE LA CAMARA 3096
-    int cameraHeight = 2000; // VALORES DE ALTO MAXIMA DE LA CAMARA 2080
+    int cameraWidth = 1800; // VALORES DE ANCHO MAXIMA DE LA CAMARA 3096
+    int cameraHeight = 1500; // VALORES DE ALTO MAXIMA DE LA CAMARA 2080
     
     ASI_IMG_TYPE imgType = ASI_IMG_RAW8; //IMPORTANTE: EN CASO DE SER RAW16 MULTIPLICAR BUFFERSIZE POR 2
-    int cameraBinning = 2;
+    int cameraBinning = 1;
     int cameraExp = 100000; // en microsegundos 1000 us = 1 ms
     int cameraGain = 400;
     int cameraBandWidth = 75;
