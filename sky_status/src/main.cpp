@@ -11,11 +11,20 @@
 #include "../include/sky_status_api_request.hpp"
 
 
+// Función para eliminar el archivo PID cuando el proceso termine
+void delete_pid_file() {
+    if (remove("./logs/pid.log") != 0) {
+        perror("Error al eliminar el archivo PID");
+    } else {
+        printf("Archivo PID eliminado exitosamente.\n");
+    }
+}
 
 // Recibir Señal Terminar Proceso
 void end_signal(int sig){
     if (sig == SIGTERM) {
         printf("Proceso Finalizado\n");
+        delete_pid_file();
         exit(EXIT_SUCCESS);
     }
 }
@@ -31,6 +40,52 @@ std::string obtenerHoraActual() {
     return string_date;
 }
 
+// Obtener el mes y el año actual
+std::string obtenerMesYAnio() {
+    std::time_t now = std::time(nullptr);
+
+    std::tm* local_time = std::localtime(&now);
+    
+    int mes = local_time->tm_mon + 1;  // El mes comienza desde 0, así que se suma 1
+    int anio = local_time->tm_year + 1900;  // El año comienza desde 1900, así que se suma 1900
+    
+    return std::to_string(mes) + "-" + std::to_string(anio);
+}
+
+// Verificar si es un nuevo mes
+bool esNuevoMes() {
+    std::time_t now = std::time(nullptr);
+    std::tm* local_time = std::localtime(&now);
+
+    int dia = local_time->tm_mday; 
+  
+        if (dia == 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void configurarOut(){
+    if (esNuevoMes()) {
+        std::string mes_anio = obtenerMesYAnio();
+        std::string log_path = "./logs/" + mes_anio + ".log";
+        int log = open(log_path.c_str(), O_RDWR | O_CREAT | O_APPEND, 0600);
+        if (log < 0) {
+            perror("Error: Log File");
+            exit(EXIT_FAILURE);
+        }
+
+        // Redirigir  Logs
+        if (dup2(log, STDOUT_FILENO) < 0 || dup2(log, STDERR_FILENO) < 0) {
+            perror("Error: Log Redirect");
+            close(log);
+            exit(EXIT_FAILURE);
+        }
+        close(log);
+    }
+    return;
+}
 
 
 // Hilo Principal
@@ -62,7 +117,9 @@ int main() {
     close(STDERR_FILENO);
 
     // Configurar Log
-    int log = open("./logs/running.log", O_RDWR | O_CREAT | O_APPEND, 0600);
+    std::string mes_anio = obtenerMesYAnio();
+    std::string log_path = "./logs/" + mes_anio + ".log";
+    int log = open(log_path.c_str(), O_RDWR | O_CREAT | O_APPEND, 0600);
     if (log < 0) {
         perror("Error: Log File");
         exit(EXIT_FAILURE);
@@ -102,14 +159,9 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Se Trabaja en la Raiz
-    if (chdir("/") < 0) {
-        perror("Error: Directory Change");
-        exit(EXIT_FAILURE);
-    }
-
     // Bucle Daemon
     while (true){
+        configurarOut();
         std::string date = obtenerHoraActual();
         std::string str_weather = sky_status_api_request();
         std::string str_is_day;
