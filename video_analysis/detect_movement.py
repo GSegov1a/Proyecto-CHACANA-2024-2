@@ -17,17 +17,11 @@ frame1_gray = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
 
 cv2.namedWindow('Detección de Movimiento', cv2.WINDOW_NORMAL)
 
-i = -1
+
 while cap.isOpened():
     ret, frame2 = cap.read()
     if not ret:
         break
-
-    i = i * (-1)
-    if i > 0:
-        print('frame saltado')
-        continue
-    print('frame, no saltado')
 
     # Convertir el segundo cuadro a escala de grises
     frame2_gray = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
