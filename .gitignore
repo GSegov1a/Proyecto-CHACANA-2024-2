@@ -9,5 +9,6 @@
 
 # Ignorar la carpeta .vscode
 .vscode/
+.sky_status/logs/
 
 *.avi
