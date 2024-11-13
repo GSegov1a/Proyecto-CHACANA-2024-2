@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Ruta al archivo de video (cambiarlo según conveniencia)
-video_path = 'Documents/2024-10-30-0332_28-CapObj.avi'
+video_path = 'rocimarquez/videobueno.AVI'
 
 # Umbral alto para detectar un cambio drástico en la luminosidad
 luminosity_threshold = 200  # Ajusta según la intensidad del brillo esperado
