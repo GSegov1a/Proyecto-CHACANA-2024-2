@@ -1,6 +1,7 @@
 #include "opencv2/opencv.hpp" 
 #include <opencv2/highgui/highgui.hpp>   
 #include "ASICamera2.h"
+#include "video_processing.h"
 #include <iostream>
 
 int main() {
@@ -142,18 +143,18 @@ int main() {
 
     //COMENZAMOS GRABACION
     int cameraId = 0;
-    int cameraWidth = 3096;
-    int cameraHeight = 2080;
+    int cameraWidth = 1800; // VALORES DE ANCHO MAXIMA DE LA CAMARA 3096
+    int cameraHeight = 1500; // VALORES DE ALTO MAXIMA DE LA CAMARA 2080
     
     ASI_IMG_TYPE imgType = ASI_IMG_RAW8; //IMPORTANTE: EN CASO DE SER RAW16 MULTIPLICAR BUFFERSIZE POR 2
-    int cameraBinning = 2;
+    int cameraBinning = 1;
     int cameraExp = 100000; // en microsegundos 1000 us = 1 ms
-    int cameraGain = 300;
-    int cameraBandWidth = 80;
+    int cameraGain = 400;
+    int cameraBandWidth = 75;
     int cameraHightSpeedMode = 0;
 
-    int realCameraWidth = 3096 / cameraBinning;
-    int realCameraHeight = 2080 / cameraBinning;
+    int realCameraWidth = cameraWidth / cameraBinning;
+    int realCameraHeight = cameraHeight / cameraBinning;
 
     int bufferSize = realCameraWidth * realCameraHeight; 
     unsigned char* frameBuffer = new unsigned char[bufferSize];
@@ -165,7 +166,7 @@ int main() {
     cv::resizeWindow("Live Camera", realCameraWidth / 2 , realCameraHeight / 2 );
 
     // INICIALIZAR GUARDADO DE VIDEO
-    std::string videoFileName = "records/output.avi";
+    std::string videoFileName = "records/output_bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
     cv::VideoWriter videoWriter;
     videoWriter.open(videoFileName, cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 10, cv::Size(realCameraWidth, realCameraHeight), false);
     
@@ -231,14 +232,19 @@ int main() {
     }
 
 
-    int k = 0;
+    int framesCount = 0;
+    double fps = 0.0;
+    double tickFrequency = cv::getTickFrequency();
+    double lastTime = cv::getTickCount(); // Variable para calcular FPS cada iteracion
+    double startTime = cv::getTickCount(); // Variable para calcular cuanto tiempo se grabo en total
+
     while (true) {
         errCode = ASIGetVideoData(cameraId, frameBuffer, bufferSize, 2*cameraExp + 500);
         if (errCode != ASI_SUCCESS) {
             std::cerr << "Error al obtener los datos de un frame en la cámara de grabacion. " << "Código de error: " << errCode << std::endl;
             continue;
         }
-        k += 1;
+        framesCount += 1;
 
         // Convertir el buffer a cv::Mat (formato de imagen en escala de grises RAW8)
         cv::Mat img(realCameraHeight, realCameraWidth, CV_8UC1, frameBuffer);
@@ -249,15 +255,30 @@ int main() {
         // Mostrar el frame en la ventana
         cv::imshow("Live Camera", img);
         
+        // Calcular el tiempo transcurrido y el FPS
+        double currentTime = cv::getTickCount();
+        double timeElapsed = (currentTime - lastTime) / tickFrequency;
+        fps = 1.0 / timeElapsed;
+        lastTime = currentTime; 
+
+        // Mostrar FPS en la consola
+        std::cout << "FPS: " << fps << std::endl;
 
         // Esperar 1 ms entre frames (permite cerrar la ventana con 'q')
         if (cv::waitKey(1) == 'q') {
             break;
         }
         
-        std::cerr << "Frame: " << k << std::endl; 
-        
     }
+
+    // Calcular el tiempo total de grabación y printear
+    double endTime = cv::getTickCount();
+    double recordingDuration = (endTime - startTime) / tickFrequency;
+
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "Tiempo total de grabacion: " << recordingDuration << " segundos." << std::endl;
+    std::cout << "Frames grabados: " << framesCount << std::endl;
+
     delete[] frameBuffer;
 
     errCode = ASIStopVideoCapture(cameraId);
@@ -271,6 +292,56 @@ int main() {
     }
 
     videoWriter.release(); // Liberar el VideoWriter
+
+
+    //ANÁLISIS DE VIDEO
+
+    // Configuración inicial
+    std::string video_path = videoFileName;
+    int luminosity_threshold = 80;  // Umbral de luminosidad
+    int edge_margin = 50;           // Margen en píxeles
+    int min_movement_size = 5;      // Tamaño mínimo en píxeles de la región de cambio drástico
+
+    // Inicializa el objeto de captura de video
+    cv::VideoCapture cap(video_path);
+    if (!cap.isOpened()) {
+        std::cerr << "No se pudo abrir el video o leer el primer fotograma." << std::endl;
+        return -1;
+    }
+
+    // Lee el primer fotograma para establecer el estado inicial
+    cv::Mat prev_frame, prev_gray;
+    cap >> prev_frame;
+    if (prev_frame.empty()) {
+        std::cerr << "El primer fotograma está vacío." << std::endl;
+        return -1;
+    }
+
+    // Convierte el primer fotograma a escala de grises
+    cv::cvtColor(prev_frame, prev_gray, cv::COLOR_BGR2GRAY);
+
+    // Procesa el video fotograma por fotograma
+    while (true) {
+        cv::Mat frame, gray;
+        cap >> frame;
+        if (frame.empty()) break;  // Fin del video
+
+        // Convierte el fotograma actual a escala de grises
+        cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+
+        // Procesa la diferencia entre fotogramas para detectar áreas de cambio luminoso
+        cv::Mat bright_areas = processFrameDifference(prev_gray, gray, luminosity_threshold, edge_margin);
+
+        // Detecta los cambios luminosos y dibuja en el fotograma
+        detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin);
+
+        // Actualiza el fotograma anterior
+        prev_gray = gray.clone();
+    }
+
+    // Libera el objeto de captura y cierra todas las ventanas
+    cap.release();
+
     cv::destroyAllWindows(); // Cerrar la ventana
 
     return 0;
