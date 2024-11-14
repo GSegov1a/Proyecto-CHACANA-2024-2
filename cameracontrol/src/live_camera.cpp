@@ -2,6 +2,35 @@
 #include <opencv2/highgui/highgui.hpp>   
 #include "ASICamera2.h"
 #include <iostream>
+#include <ctime>
+#include <string>
+#include <filesystem>
+
+
+
+// Obtener el dia,mes y el año actual
+std::string obtenerDia() {
+    std::time_t now = std::time(nullptr);
+    std::tm* local_time = std::localtime(&now);
+
+    int dia = local_time->tm_mday;
+    int mes = local_time->tm_mon + 1;  // El mes comienza desde 0, así que se suma 1
+    int anio = local_time->tm_year + 1900;  // El año comienza desde 1900, así que se suma 1900
+    
+    return std::to_string(dia) + "-" + std::to_string(mes) + "-" + std::to_string(anio);
+}
+
+// Obtener la hora actual
+std::string obtenerHora() {
+    std::time_t now = std::time(nullptr);
+    std::tm* local_time = std::localtime(&now);
+
+    int hora = local_time->tm_hour;
+    int minuto = local_time->tm_min;
+
+    return std::to_string(hora) + ":" + std::to_string(minuto);
+}
+
 
 int main(int argc, char *argv[]) {
     int recordingTime = 0;
@@ -158,7 +187,7 @@ int main(int argc, char *argv[]) {
     ASI_IMG_TYPE imgType = ASI_IMG_RAW8; //IMPORTANTE: EN CASO DE SER RAW16 MULTIPLICAR BUFFERSIZE POR 2
     int cameraBinning = 1;
     int cameraExp = 100000; // en microsegundos 1000 us = 1 ms
-    int cameraGain = 400;
+    int cameraGain = 300;
     int cameraBandWidth = 75;
     int cameraHightSpeedMode = 0;
 
@@ -175,8 +204,18 @@ int main(int argc, char *argv[]) {
     cv::resizeWindow("Live Camera", realCameraWidth / 2 , realCameraHeight / 2 );
 
     // INICIALIZAR GUARDADO DE VIDEO
-    std::string videoFileName = "records/output_bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
+    std::string date = obtenerDia(); //devuelve un string en dormato dd-mm-yyyy
+
+    // Crear el directorio con la fecha, si no existe
+    std::string directoryName = "records/" + date;
+    std::filesystem::create_directories(directoryName);
+
+    // Crear el nombre del archivo de video
+    std::string hour = obtenerHora(); //devuelve un string en formato hh:mm
+    std::string videoFileName = directoryName + "/" + hour + "--" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
+
     cv::VideoWriter videoWriter;
+
     videoWriter.open(videoFileName, cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 10, cv::Size(realCameraWidth, realCameraHeight), false);
     
     if (!videoWriter.isOpened()) {
