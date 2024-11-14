@@ -201,7 +201,7 @@ int main() {
         
         fprintf(stdout, "[%s] Estado: [%s][%s][%s]\n", date.c_str(), str_is_day.c_str(), str_weather_code.c_str(), str_temperature.c_str());
         fflush(stdout);
-        sleep(60*60);
+        sleep(10*60);
     }
     
 }
