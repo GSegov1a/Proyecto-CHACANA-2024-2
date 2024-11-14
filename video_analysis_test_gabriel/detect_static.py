@@ -14,7 +14,7 @@ if not ret:
     exit()
 
 cv2.namedWindow('Deteccion', cv2.WINDOW_NORMAL)
-
+q
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -25,7 +25,7 @@ while cap.isOpened():
 
 
     # Aplicar un umbral para resaltar las áreas con brillo
-    _, thresh = cv2.threshold(frame_gray, 60, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(frame_gray, 50, 255, cv2.THRESH_BINARY)
     cv2.imshow('Threshold', thresh)
     # Obtener las coordenadas de todos los puntos blancos
     white_points = cv2.findNonZero(thresh)

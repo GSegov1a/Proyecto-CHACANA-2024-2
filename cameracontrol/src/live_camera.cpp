@@ -3,7 +3,17 @@
 #include "ASICamera2.h"
 #include <iostream>
 
-int main() {
+int main(int argc, char *argv[]) {
+    int recordingTime = 0;
+    if (argc > 1) {
+        try{
+            recordingTime = std::stoi(argv[1]);
+        } catch(const std::exception& e) {
+            std::cerr << "Error : " << e.what() << std::endl;
+        }
+        
+    }
+
     // VERIFICAMOS CAMARAS CONECTADAS
     int numCameras = ASIGetNumOfConnectedCameras();
     if (numCameras <= 0) {
@@ -236,6 +246,7 @@ int main() {
     double tickFrequency = cv::getTickFrequency();
     double lastTime = cv::getTickCount(); // Variable para calcular FPS cada iteracion
     double startTime = cv::getTickCount(); // Variable para calcular cuanto tiempo se grabo en total
+    double maxDurationTicks = recordingTime * tickFrequency; // Duracion maxima de grabacion en ticks
 
     while (true) {
         errCode = ASIGetVideoData(cameraId, frameBuffer, bufferSize, 2*cameraExp + 500);
@@ -259,6 +270,15 @@ int main() {
         double timeElapsed = (currentTime - lastTime) / tickFrequency;
         fps = 1.0 / timeElapsed;
         lastTime = currentTime; 
+
+        // Calcular el tiempo total de grabación y detener la grabación si se alcanza el tiempo máximo
+        if (recordingTime > 0) {
+            if ((currentTime - startTime) > maxDurationTicks) {
+                std::cout << "Tiempo de grabacion completado" << std::endl;
+                break;
+            }
+        }
+
 
         // Mostrar FPS en la consola
         std::cout << "FPS: " << fps << std::endl;

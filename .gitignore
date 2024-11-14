@@ -28,3 +28,4 @@ cameracontrol/records/
 
 # Permitir que las carpetas bin/ estén vacías con un archivo .gitkeep
 !**/logs/.gitkeep
+
