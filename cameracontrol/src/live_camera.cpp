@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
     // Crear el nombre del archivo de video
     std::string hour = obtenerHora(); //devuelve un string en formato hh:mm
-    std::string videoFileName = directoryName + "/" + hour + "--" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
+    std::string videoFileName = directoryName + "/" + hour + "--_bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
 
     cv::VideoWriter videoWriter;
 
