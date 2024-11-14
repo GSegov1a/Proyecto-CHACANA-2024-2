@@ -195,7 +195,7 @@ int main() {
             str_temperature = "error";
         }
 
-        if (str_is_day == "Dia" && str_weather_code == "Despejado") {
+        if (str_is_day == "Noche" && str_weather_code == "Despejado") {
             std::system("cd /home/oduc/Escritorio/Proyecto-CHACANA-2024-2/cameracontrol && make run ARGS=20 > /dev/null 2>&1");
         }
         
