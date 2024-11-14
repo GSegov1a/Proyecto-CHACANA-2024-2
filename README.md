@@ -7,4 +7,3 @@ Avances investigacion Proyecto CHACANA, en 2024-2
 - sky_status: Daemon que cada una hora consulta una API e imprime en un log, la hora y el clima.
 
 - cameracontrol: Script que usa la libreria de ASICamera para grabar.
-- videonalisis: Script que entrega coordenadas de pixel inicial si es que encuentra un cambio drástico de luminosidad del pixel a lo largo de los fotogramas

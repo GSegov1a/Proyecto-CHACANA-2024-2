@@ -2,8 +2,47 @@
 #include <opencv2/highgui/highgui.hpp>   
 #include "ASICamera2.h"
 #include <iostream>
+#include <ctime>
+#include <string>
+#include <filesystem>
 
-int main() {
+
+
+// Obtener el dia,mes y el año actual
+std::string obtenerDia() {
+    std::time_t now = std::time(nullptr);
+    std::tm* local_time = std::localtime(&now);
+
+    int dia = local_time->tm_mday;
+    int mes = local_time->tm_mon + 1;  // El mes comienza desde 0, así que se suma 1
+    int anio = local_time->tm_year + 1900;  // El año comienza desde 1900, así que se suma 1900
+    
+    return std::to_string(dia) + "-" + std::to_string(mes) + "-" + std::to_string(anio);
+}
+
+// Obtener la hora actual
+std::string obtenerHora() {
+    std::time_t now = std::time(nullptr);
+    std::tm* local_time = std::localtime(&now);
+
+    int hora = local_time->tm_hour;
+    int minuto = local_time->tm_min;
+
+    return std::to_string(hora) + "-" + std::to_string(minuto);
+}
+
+
+int main(int argc, char *argv[]) {
+    int recordingTime = 0;
+    if (argc > 1) {
+        try{
+            recordingTime = std::stoi(argv[1]);
+        } catch(const std::exception& e) {
+            std::cerr << "Error : " << e.what() << std::endl;
+        }
+        
+    }
+
     // VERIFICAMOS CAMARAS CONECTADAS
     int numCameras = ASIGetNumOfConnectedCameras();
     if (numCameras <= 0) {
@@ -142,18 +181,18 @@ int main() {
 
     //COMENZAMOS GRABACION
     int cameraId = 0;
-    int cameraWidth = 3096;
-    int cameraHeight = 2080;
+    int cameraWidth = 1800; // VALORES DE ANCHO MAXIMA DE LA CAMARA 3096
+    int cameraHeight = 1500; // VALORES DE ALTO MAXIMA DE LA CAMARA 2080
     
     ASI_IMG_TYPE imgType = ASI_IMG_RAW8; //IMPORTANTE: EN CASO DE SER RAW16 MULTIPLICAR BUFFERSIZE POR 2
-    int cameraBinning = 2;
+    int cameraBinning = 1;
     int cameraExp = 100000; // en microsegundos 1000 us = 1 ms
     int cameraGain = 300;
-    int cameraBandWidth = 80;
+    int cameraBandWidth = 75;
     int cameraHightSpeedMode = 0;
 
-    int realCameraWidth = 3096 / cameraBinning;
-    int realCameraHeight = 2080 / cameraBinning;
+    int realCameraWidth = cameraWidth / cameraBinning;
+    int realCameraHeight = cameraHeight / cameraBinning;
 
     int bufferSize = realCameraWidth * realCameraHeight; 
     unsigned char* frameBuffer = new unsigned char[bufferSize];
@@ -165,8 +204,18 @@ int main() {
     cv::resizeWindow("Live Camera", realCameraWidth / 2 , realCameraHeight / 2 );
 
     // INICIALIZAR GUARDADO DE VIDEO
-    std::string videoFileName = "records/output.avi";
+    std::string date = obtenerDia(); //devuelve un string en dormato dd-mm-yyyy
+
+    // Crear el directorio con la fecha, si no existe
+    std::string directoryName = "records/" + date;
+    std::filesystem::create_directories(directoryName);
+
+    // Crear el nombre del archivo de video
+    std::string hour = obtenerHora(); //devuelve un string en formato hh:mm
+    std::string videoFileName = directoryName + "/" + hour + "___bin" + std::to_string(cameraBinning) + "_exp" + std::to_string(cameraExp) + "us" + "_gain" + std::to_string(cameraGain) + "_bandwidth" + std::to_string(cameraBandWidth) + "_" + std::to_string(realCameraWidth) + "x" + std::to_string(realCameraHeight) + ".avi";
+
     cv::VideoWriter videoWriter;
+
     videoWriter.open(videoFileName, cv::VideoWriter::fourcc('X', 'V', 'I', 'D'), 10, cv::Size(realCameraWidth, realCameraHeight), false);
     
     if (!videoWriter.isOpened()) {
@@ -231,14 +280,20 @@ int main() {
     }
 
 
-    int k = 0;
+    int framesCount = 0;
+    double fps = 0.0;
+    double tickFrequency = cv::getTickFrequency();
+    double lastTime = cv::getTickCount(); // Variable para calcular FPS cada iteracion
+    double startTime = cv::getTickCount(); // Variable para calcular cuanto tiempo se grabo en total
+    double maxDurationTicks = recordingTime * tickFrequency; // Duracion maxima de grabacion en ticks
+
     while (true) {
         errCode = ASIGetVideoData(cameraId, frameBuffer, bufferSize, 2*cameraExp + 500);
         if (errCode != ASI_SUCCESS) {
             std::cerr << "Error al obtener los datos de un frame en la cámara de grabacion. " << "Código de error: " << errCode << std::endl;
             continue;
         }
-        k += 1;
+        framesCount += 1;
 
         // Convertir el buffer a cv::Mat (formato de imagen en escala de grises RAW8)
         cv::Mat img(realCameraHeight, realCameraWidth, CV_8UC1, frameBuffer);
@@ -249,15 +304,39 @@ int main() {
         // Mostrar el frame en la ventana
         cv::imshow("Live Camera", img);
         
+        // Calcular el tiempo transcurrido y el FPS
+        double currentTime = cv::getTickCount();
+        double timeElapsed = (currentTime - lastTime) / tickFrequency;
+        fps = 1.0 / timeElapsed;
+        lastTime = currentTime; 
+
+        // Calcular el tiempo total de grabación y detener la grabación si se alcanza el tiempo máximo
+        if (recordingTime > 0) {
+            if ((currentTime - startTime) > maxDurationTicks) {
+                std::cout << "Tiempo de grabacion completado" << std::endl;
+                break;
+            }
+        }
+
+
+        // Mostrar FPS en la consola
+        std::cout << "FPS: " << fps << std::endl;
 
         // Esperar 1 ms entre frames (permite cerrar la ventana con 'q')
         if (cv::waitKey(1) == 'q') {
             break;
         }
         
-        std::cerr << "Frame: " << k << std::endl; 
-        
     }
+
+    // Calcular el tiempo total de grabación y printear
+    double endTime = cv::getTickCount();
+    double recordingDuration = (endTime - startTime) / tickFrequency;
+
+    std::cout << "------------------------------------------------------------" << std::endl;
+    std::cout << "Tiempo total de grabacion: " << recordingDuration << " segundos." << std::endl;
+    std::cout << "Frames grabados: " << framesCount << std::endl;
+
     delete[] frameBuffer;
 
     errCode = ASIStopVideoCapture(cameraId);

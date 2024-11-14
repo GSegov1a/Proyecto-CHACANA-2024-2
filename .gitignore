@@ -10,4 +10,22 @@
 # Ignorar la carpeta .vscode
 .vscode/
 
+# Ignorar todos los archivos .avi
 *.avi
+*.AVI
+
+# Ignorar la carpeta records dentro de cameracontrol
+cameracontrol/records/
+
+# Ignorar todos los archivos .log
+*.log
+
+# Ignorar todos los archivos en la carpeta log/
+**/logs/*
+
+# Permitir que las carpetas bin/ permanezcan
+!**/logs/
+
+# Permitir que las carpetas bin/ estén vacías con un archivo .gitkeep
+!**/logs/.gitkeep
+
