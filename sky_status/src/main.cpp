@@ -195,6 +195,9 @@ int main() {
             str_temperature = "error";
         }
 
+        if (str_is_day == "Dia" && str_weather_code == "Despejado") {
+            std::system("cd /home/oduc/Escritorio/Proyecto-CHACANA-2024-2/cameracontrol && make run ARGS=20");
+        }
         
         fprintf(stdout, "[%s] Estado: [%s][%s][%s]\n", date.c_str(), str_is_day.c_str(), str_weather_code.c_str(), str_temperature.c_str());
         fflush(stdout);
