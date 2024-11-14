@@ -18,4 +18,4 @@ clean:
 
 # Ejecución del programa
 run: $(TARGET)
-	LD_LIBRARY_PATH=$(LD) ./$(TARGET)
+	LD_LIBRARY_PATH=$(LD) ./$(TARGET) $(ARGS)
