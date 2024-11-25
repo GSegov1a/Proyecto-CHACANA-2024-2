@@ -8,9 +8,12 @@ LIBS=-lASICamera2 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_video
 # Nombre del ejecutable
 TARGET = bin/live_camera
 
+# Archivos fuente
+SRCS = src/live_camera.cpp src/video_processing.cpp
+
 # Compilar el programa
-$(TARGET): src/live_camera.cpp
-	$(CC) $< -o $@ $(CFLAGS) $(LDIR) $(LIBS)
+$(TARGET): $(SRCS)
+	$(CC) $(SRCS) -o $@ $(CFLAGS) $(LDIR) $(LIBS)
 
 # Limpiar el ejecutable
 clean:
