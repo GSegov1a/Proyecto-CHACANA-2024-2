@@ -66,7 +66,7 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
         // El directorio no existe, lo creamos
         if (mkdir(directory.c_str(), 0777) == -1) {
             std::cerr << "Error al crear el directorio: " << directory << std::endl;
-            return;
+            
         }
     }
 
