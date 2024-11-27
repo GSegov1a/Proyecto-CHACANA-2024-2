@@ -68,7 +68,7 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
     }
 
     // Definir el nombre del archivo con un nombre único
-    std::string file_name = directory + "/frame_" + date_str + std::to_string(std::time(nullptr))+ ".png";
+    std::string file_name = directory + "frame_" + date_str + std::to_string(std::time(nullptr))+ ".png";
     
             // Guardar la imagen en la carpeta "records"
             if (cv::imwrite(file_name, frame)) {
