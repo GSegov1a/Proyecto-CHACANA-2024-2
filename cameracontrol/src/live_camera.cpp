@@ -304,7 +304,7 @@ int main() {
         return -1;
     }
 
-    int luminosity_threshold = 10; //50
+    int luminosity_threshold = 0; //50
     int edge_margin = 10; //20
     int min_movement_size = 30;
 
@@ -349,6 +349,7 @@ int main() {
     cap.release();
 
     // Verificar si hubo detección y eliminar el video si no hubo
+    //borrar desde aquí hasta 
     if (!detection_made) {
         std::cout << "No se detectaron cambios significativos. Eliminando el video..." << std::endl;
         if (std::remove(videoFileName.c_str()) == 0) {
@@ -359,6 +360,7 @@ int main() {
     } else {
         std::cout << "Cambios detectados. Video conservado." << std::endl;
     }
+    //aquí si es que no se quiere borrar el video.
     cv::destroyAllWindows(); // Cerrar la ventana
 
     return 0;
