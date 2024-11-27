@@ -60,7 +60,7 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
     std::string date_str = date_stream.str();
 
     // Crear el directorio "records/cambios_detectados/fecha_de_video" si no existe
-    std::string directory = "records/cambios_detectados/" + date_str;
+    std::string directory = "records/cambio_detectado/" + date_str;
     struct stat info;
     if (stat(directory.c_str(), &info) != 0) {
         // El directorio no existe, lo creamos
