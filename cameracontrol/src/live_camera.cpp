@@ -298,8 +298,8 @@ int main() {
     //ANÁLISIS VIDEO
     // Variable para registrar detecciones
     bool detection_made = false;
-    //cv::VideoCapture cap(videoFileName);
-    cv::VideoCapture cap("records/14-11-2024/4-18___bin1_exp100000us_gain300_bandwidth75_1800x1500.avi");
+    cv::VideoCapture cap(videoFileName);
+    //cv::VideoCapture cap("records/14-11-2024/4-18___bin1_exp100000us_gain300_bandwidth75_1800x1500.avi");
     if (!cap.isOpened()) {
         std::cerr << "Error al abrir el video" << std::endl;
         return -1;
