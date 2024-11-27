@@ -22,7 +22,7 @@ cv::Mat processFrameDifference(const cv::Mat& prev_gray, const cv::Mat& gray, in
 }
 
 // Detecta cambios luminosos y dibuja un rectángulo en las áreas con cambio drástico
-void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, int min_movement_size, int edge_margin) {
+void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, int min_movement_size, int edge_margin, bool detection_made) {
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(bright_areas, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
@@ -30,6 +30,7 @@ void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
     for (const auto& contour : contours) {
         cv::Rect bounding_box = cv::boundingRect(contour);
         if (bounding_box.width >= min_movement_size || bounding_box.height >= min_movement_size) {
+            detection_made = true; //se detecto un cambio
             bounding_box.x += edge_margin;
             bounding_box.y += edge_margin;
             std::cout << "Cambio drástico detectado en la región: posición inicial (x=" << bounding_box.x

@@ -292,6 +292,12 @@ int main() {
     }
 
     videoWriter.release(); // Liberar el VideoWriter
+
+
+
+    //ANÁLISIS VIDEO
+    // Variable para registrar detecciones
+    bool detection_made = false;
     cv::VideoCapture cap(videoFileName);
     if (!cap.isOpened()) {
         std::cerr << "Error al abrir el video" << std::endl;
@@ -329,7 +335,7 @@ int main() {
         }
 
         // Detecta cambios luminosos
-        detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin);
+        detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin, detection_made);
         std::cout << "Análisis de cambios luminosos completado para fotograma #" << frame_count << std::endl;
 
         // Actualiza el fotograma anterior
@@ -342,7 +348,17 @@ int main() {
 
     cap.release();
 
-
+    // Verificar si hubo detección y eliminar el video si no hubo
+    if (!detection_made) {
+        std::cout << "No se detectaron cambios significativos. Eliminando el video..." << std::endl;
+        if (std::remove(videoFileName.c_str()) == 0) {
+            std::cout << "Video eliminado correctamente." << std::endl;
+        } else {
+            std::cerr << "Error al intentar eliminar el video." << std::endl;
+        }
+    } else {
+        std::cout << "Cambios detectados. Video conservado." << std::endl;
+    }
     cv::destroyAllWindows(); // Cerrar la ventana
 
     return 0;
