@@ -22,7 +22,7 @@ cv::Mat processFrameDifference(const cv::Mat& prev_gray, const cv::Mat& gray, in
 }
 
 // Detecta cambios luminosos y dibuja un rectángulo en las áreas con cambio drástico
-void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, int min_movement_size, int edge_margin, bool detection_made) {
+bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, int min_movement_size, int edge_margin, bool detection_made) {
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(bright_areas, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
@@ -39,11 +39,22 @@ void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
 
             // Dibuja un rectángulo alrededor de la región detectada
             cv::rectangle(frame, bounding_box, cv::Scalar(0, 0, 255), 2);
+                        // Crear un nombre único para el archivo de imagen
+            std::string filename = "records/cambio_detectado_" + std::to_string(std::time(nullptr)) + ".jpg";
+
+            // Guardar la imagen en la carpeta "records"
+            if (cv::imwrite(filename, frame)) {
+                std::cout << "Fotograma guardado en: " << filename << std::endl;
+            } else {
+                std::cout << "Error al guardar la imagen." << std::endl;
+            }
 
             // Muestra el cambio detectado
             cv::imshow("Cambio Drástico Detectado", frame);
-            cv::waitKey(1);  // Pausa hasta que se cierre la ventana
+            cv::waitKey(1);
+              // Pausa hasta que se cierre la ventana
             break;
         }
     }
+    return detection_made;
 }
