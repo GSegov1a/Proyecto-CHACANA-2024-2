@@ -1,5 +1,7 @@
 #include "video_processing.h"
 #include <iostream>
+#include <ctime> // Para obtener la fecha y hora actuales
+#include <sstream> // Para convertir los valores a cadenas de texto
 
 // Procesa la diferencia entre dos fotogramas y devuelve las áreas brillantes
 cv::Mat processFrameDifference(const cv::Mat& prev_gray, const cv::Mat& gray, int luminosity_threshold, int edge_margin) {
@@ -40,10 +42,25 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
             // Dibuja un rectángulo alrededor de la región detectada
             cv::rectangle(frame, bounding_box, cv::Scalar(0, 0, 255), 2);
                         // Crear un nombre único para el archivo de imagen
-            std::string filename = "records/cambio_detectado/" + std::to_string(std::time(nullptr)) + ".jpg";
+                                    // Crear un formato para la fecha y hora: "yyyy-mm-dd_hh-mm-ss"
+                                                // Obtener la fecha y hora actuales
+            std::time_t now = std::time(nullptr);
+            std::tm* local_time = std::localtime(&now);
+                // Formato de la fecha: año-mes-día_hora-minuto-segundo
+    std::stringstream date_stream;
+    date_stream << (local_time->tm_year + 1900) << "-" 
+                << (local_time->tm_mon + 1) << "-" 
+                << local_time->tm_mday << "_"
+                << local_time->tm_hour << "-"
+                << local_time->tm_min << "-"
+                << local_time->tm_sec;
+
+    std::string date_str = date_stream.str();
+    std::string directory = "records/cambios_detectados/" + date_str;
+     std::string file_name = directory + "/frame_" + date_str + ".png";
 
             // Guardar la imagen en la carpeta "records"
-            if (cv::imwrite(filename, frame)) {
+            if (cv::imwrite(file_name, frame)) {
                 //std::cout << "Fotograma guardado en: " << filename << std::endl;
             } else {
                 std::cout << "Error al guardar la imagen." << std::endl;
