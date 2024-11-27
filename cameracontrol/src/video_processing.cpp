@@ -52,10 +52,7 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
     std::stringstream date_stream;
     date_stream << (local_time->tm_year + 1900) << "-" 
                 << (local_time->tm_mon + 1) << "-" 
-                << local_time->tm_mday << "_"
-                << local_time->tm_hour << "-"
-                << local_time->tm_min << "-"
-                << local_time->tm_sec;
+                << local_time->tm_mday;
 
     std::string date_str = date_stream.str();
 
@@ -71,7 +68,7 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
     }
 
     // Definir el nombre del archivo con un nombre único
-    std::string file_name = directory + "/frame_" + date_str + ".png";
+    std::string file_name = directory + "frame_" + date_str + ".png";
     
             // Guardar la imagen en la carpeta "records"
             if (cv::imwrite(file_name, frame)) {
