@@ -3,7 +3,7 @@ CC=g++
 CFLAGS=-I./src/ASICamera/include/ -I/usr/include/opencv4/ 
 LD=./src/ASICamera/lib/x64/
 LDIR=-L$(LD)
-LIBS=-lASICamera2 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio 
+LIBS=-lASICamera2 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs
 
 # Nombre del ejecutable
 TARGET = bin/live_camera
