@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ctime> // Para obtener la fecha y hora actuales
 #include <sstream> // Para convertir los valores a cadenas de texto
+#include <sys/stat.h>
 
 // Procesa la diferencia entre dos fotogramas y devuelve las áreas brillantes
 cv::Mat processFrameDifference(const cv::Mat& prev_gray, const cv::Mat& gray, int luminosity_threshold, int edge_margin) {
@@ -44,9 +45,10 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
                         // Crear un nombre único para el archivo de imagen
                                     // Crear un formato para la fecha y hora: "yyyy-mm-dd_hh-mm-ss"
                                                 // Obtener la fecha y hora actuales
-            std::time_t now = std::time(nullptr);
-            std::tm* local_time = std::localtime(&now);
-                // Formato de la fecha: año-mes-día_hora-minuto-segundo
+ std::time_t current_time = std::time(nullptr);
+    std::tm* local_time = std::localtime(&current_time);
+
+    // Formato de la fecha: año-mes-día_hora-minuto-segundo
     std::stringstream date_stream;
     date_stream << (local_time->tm_year + 1900) << "-" 
                 << (local_time->tm_mon + 1) << "-" 
@@ -56,9 +58,21 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
                 << local_time->tm_sec;
 
     std::string date_str = date_stream.str();
-    std::string file_name = "records/cambio_detectado/" + date_str;
-    // std::string file_name = directory + "/frame_" + date_str + ".png";
 
+    // Crear el directorio "records/cambios_detectados/fecha_de_video" si no existe
+    std::string directory = "records/cambios_detectados/" + date_str;
+    struct stat info;
+    if (stat(directory.c_str(), &info) != 0) {
+        // El directorio no existe, lo creamos
+        if (mkdir(directory.c_str(), 0777) == -1) {
+            std::cerr << "Error al crear el directorio: " << directory << std::endl;
+            return;
+        }
+    }
+
+    // Definir el nombre del archivo con un nombre único
+    std::string file_name = directory + "/frame_" + date_str + ".png";
+    
             // Guardar la imagen en la carpeta "records"
             if (cv::imwrite(file_name, frame)) {
                 //std::cout << "Fotograma guardado en: " << filename << std::endl;
