@@ -304,9 +304,9 @@ int main() {
         return -1;
     }
 
-    int luminosity_threshold = 0; //50
-    int edge_margin = 10; //20
-    int min_movement_size = 30;
+    int luminosity_threshold = 10; //50
+    int edge_margin = 0; //20
+    int min_movement_size = 2;
 
     cv::Mat prev_gray, gray, frame;
     if (!cap.read(frame)) {
