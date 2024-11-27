@@ -292,55 +292,56 @@ int main() {
     }
 
     videoWriter.release(); // Liberar el VideoWriter
-
-
-    //ANÁLISIS DE VIDEO
-
-    // Configuración inicial
-    std::string video_path = videoFileName;
-    int luminosity_threshold = 80;  // Umbral de luminosidad
-    int edge_margin = 50;           // Margen en píxeles
-    int min_movement_size = 5;      // Tamaño mínimo en píxeles de la región de cambio drástico
-
-    // Inicializa el objeto de captura de video
-    cv::VideoCapture cap(video_path);
+    cv::VideoCapture cap(videoFileName);
     if (!cap.isOpened()) {
-        std::cerr << "No se pudo abrir el video o leer el primer fotograma." << std::endl;
+        std::cerr << "Error al abrir el video" << std::endl;
         return -1;
     }
 
-    // Lee el primer fotograma para establecer el estado inicial
-    cv::Mat prev_frame, prev_gray;
-    cap >> prev_frame;
-    if (prev_frame.empty()) {
-        std::cerr << "El primer fotograma está vacío." << std::endl;
+    int luminosity_threshold = 50;
+    int edge_margin = 20;
+    int min_movement_size = 30;
+
+    cv::Mat prev_gray, gray, frame;
+    if (!cap.read(frame)) {
+        std::cerr << "No se pudo leer el primer frame" << std::endl;
         return -1;
     }
+    std::cout << "Primer fotograma leído correctamente." << std::endl;
 
-    // Convierte el primer fotograma a escala de grises
-    cv::cvtColor(prev_frame, prev_gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(frame, prev_gray, cv::COLOR_BGR2GRAY);
+    int frame_count = 0;  // Contador de fotogramas procesados
 
-    // Procesa el video fotograma por fotograma
-    while (true) {
-        cv::Mat frame, gray;
-        cap >> frame;
-        if (frame.empty()) break;  // Fin del video
+    while (cap.read(frame)) {
+        frame_count++;
+        std::cout << "Procesando fotograma #" << frame_count << std::endl;
 
-        // Convierte el fotograma actual a escala de grises
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
-        // Procesa la diferencia entre fotogramas para detectar áreas de cambio luminoso
+        // Procesa la diferencia entre fotogramas
         cv::Mat bright_areas = processFrameDifference(prev_gray, gray, luminosity_threshold, edge_margin);
+        std::cout << "Procesamiento de diferencia completado para fotograma #" << frame_count << std::endl;
 
-        // Detecta los cambios luminosos y dibuja en el fotograma
+        // Debug opcional: guarda las imágenes procesadas
+        if (frame_count == 1) {
+            cv::imwrite("debug_frame_diff.png", bright_areas);
+            std::cout << "Se guardó el frame_diff para depuración." << std::endl;
+        }
+
+        // Detecta cambios luminosos
         detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin);
+        std::cout << "Análisis de cambios luminosos completado para fotograma #" << frame_count << std::endl;
 
         // Actualiza el fotograma anterior
         prev_gray = gray.clone();
+
+        // Muestra el video procesado
+        cv::imshow("Video Procesado", frame);
+        if (cv::waitKey(30) >= 0) break;
     }
 
-    // Libera el objeto de captura y cierra todas las ventanas
     cap.release();
+
 
     cv::destroyAllWindows(); // Cerrar la ventana
 
