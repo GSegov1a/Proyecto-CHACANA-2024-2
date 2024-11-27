@@ -336,7 +336,7 @@ int main() {
         //}
 
         // Detecta cambios luminosos
-        detection_made =  detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin, detection_made);
+        detection_made = detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin, detection_made);
         std::cout << "Análisis de cambios luminosos completado para fotograma #" << frame_count << std::endl;
 
         // Actualiza el fotograma anterior

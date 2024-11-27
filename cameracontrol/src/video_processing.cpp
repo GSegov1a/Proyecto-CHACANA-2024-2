@@ -56,8 +56,8 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
                 << local_time->tm_sec;
 
     std::string date_str = date_stream.str();
-    std::string directory = "records/cambio_detectado/" + date_str;
-     std::string file_name = directory + "/frame_" + date_str + ".png";
+    std::string file_name = "records/cambio_detectado/" + date_str;
+    // std::string file_name = directory + "/frame_" + date_str + ".png";
 
             // Guardar la imagen en la carpeta "records"
             if (cv::imwrite(file_name, frame)) {
