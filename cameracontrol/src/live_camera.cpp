@@ -304,8 +304,8 @@ int main() {
         return -1;
     }
 
-    int luminosity_threshold = 50;
-    int edge_margin = 20;
+    int luminosity_threshold = 10; //50
+    int edge_margin = 10; //20
     int min_movement_size = 30;
 
     cv::Mat prev_gray, gray, frame;
@@ -329,10 +329,10 @@ int main() {
         std::cout << "Procesamiento de diferencia completado para fotograma #" << frame_count << std::endl;
 
         // Debug opcional: guarda las imágenes procesadas
-        if (frame_count == 1) {
-            cv::imwrite("debug_frame_diff.png", bright_areas);
-            std::cout << "Se guardó el frame_diff para depuración." << std::endl;
-        }
+        //if (frame_count == 1) {
+            //cv::imwrite("debug_frame_diff.png", bright_areas);
+            //std::cout << "Se guardó el frame_diff para depuración." << std::endl;
+        //}
 
         // Detecta cambios luminosos
         detectLuminosityChanges(frame, bright_areas, min_movement_size, edge_margin, detection_made);
@@ -342,7 +342,7 @@ int main() {
         prev_gray = gray.clone();
 
         // Muestra el video procesado
-        cv::imshow("Video Procesado", frame);
+        //cv::imshow("Video Procesado", frame);
         if (cv::waitKey(30) >= 0) break;
     }
 
