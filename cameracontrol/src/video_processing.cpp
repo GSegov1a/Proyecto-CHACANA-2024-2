@@ -40,18 +40,18 @@ bool detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
             // Dibuja un rectángulo alrededor de la región detectada
             cv::rectangle(frame, bounding_box, cv::Scalar(0, 0, 255), 2);
                         // Crear un nombre único para el archivo de imagen
-            std::string filename = "records/cambio_detectado_" + std::to_string(std::time(nullptr)) + ".jpg";
+            std::string filename = "records/cambio_detectado/" + std::to_string(std::time(nullptr)) + ".jpg";
 
             // Guardar la imagen en la carpeta "records"
             if (cv::imwrite(filename, frame)) {
-                std::cout << "Fotograma guardado en: " << filename << std::endl;
+                //std::cout << "Fotograma guardado en: " << filename << std::endl;
             } else {
                 std::cout << "Error al guardar la imagen." << std::endl;
             }
 
             // Muestra el cambio detectado
-            cv::imshow("Cambio Drástico Detectado", frame);
-            cv::waitKey(1);
+            //cv::imshow("Cambio Drástico Detectado", frame);
+            //cv::waitKey(1);
               // Pausa hasta que se cierre la ventana
             break;
         }
