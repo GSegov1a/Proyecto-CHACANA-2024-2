@@ -42,7 +42,7 @@ void detectLuminosityChanges(const cv::Mat& frame, const cv::Mat& bright_areas, 
 
             // Muestra el cambio detectado
             cv::imshow("Cambio Drástico Detectado", frame);
-            cv::waitKey(0);  // Pausa hasta que se cierre la ventana
+            cv::waitKey(1);  // Pausa hasta que se cierre la ventana
             break;
         }
     }
